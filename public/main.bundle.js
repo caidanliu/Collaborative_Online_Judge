@@ -213,7 +213,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/components/editor/editor.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<section>\n   <header>\n     <select class=\"form-control pull-left lang-select\"  \n             id=\"language\" \n             name=\"language\"\n             [(ngModel)] = \"language\"\n             (change)=\"setLanguage(language)\">\n     \n      <option *ngFor=\"let language of languages\"\n      [value]=\"language\">\n        {{language}}\n       </option>\n       </select>\n      <button type=\"button\" class=\"btn btn-default\" data-toggle=\"modal\" data-target=\"#myModal\">\n      <span class=\"glyphicon glyphicon-refresh\" aria-hidden=\"true\"></span>\n    </button>\n    <!-- Modal -->\n    <div class=\"modal fade\" id=\"myModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\" aria-hidden=\"true\">\n      <div class=\"modal-dialog\" role=\"document\">\n        <div class=\"modal-content\">\n          <div class=\"modal-header\">\n            <h1 class=\"modal-title\" id=\"exampleModalLabel\">Reset?</h1>\n            <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n              <span aria-hidden=\"true\">&times;</span>\n            </button>\n          </div>\n          <div class=\"modal-body\">\n            Are you sure? Are you okay?\n          </div>\n          <div class=\"modal-footer\">\n            <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"\n              (click)=\"resetEditor()\">Reset</button>\n            <button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\">Cancel</button>\n          </div>\n        </div>\n      </div>\n    </div>\n\n\n\n\n   </header>\n   \n   <div class=row>\n       <div id=\"editor\">\n       </div>\n   </div>\n   \n   <footer>\n     <button type=\"button\" class=\"btn btn-success pull-right\" (click)=\"submit()\">\n     Submit Solution\n     </button>\n   </footer>\n\n</section>\n\n\n"
+module.exports = "<section>\n  <header>\n    <select class=\"form-control pull-left lang-select\" id=\"language\" \n        name=\"language\" \n        [(ngModel)]=\"language\"\n        (change)=\"setLanguage(language)\" \n       >\n       <option *ngFor=\"let language of languages\" \n       [value]=\"language\">\n         {{language}}\n       </option>\n    </select>\n    <button type=\"button\" class=\"btn btn-default\" data-toggle=\"modal\" data-target=\"#myModal\">\n      <span class=\"glyphicon glyphicon-refresh\" aria-hidden=\"true\"></span>\n    </button>\n    <!-- Modal -->\n    <div class=\"modal fade\" id=\"myModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\" aria-hidden=\"true\">\n      <div class=\"modal-dialog\" role=\"document\">\n        <div class=\"modal-content\">\n          <div class=\"modal-header\">\n            <h1 class=\"modal-title\" id=\"exampleModalLabel\">Reset?</h1>\n            <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n              <span aria-hidden=\"true\">&times;</span>\n            </button>\n          </div>\n          <div class=\"modal-body\">\n            Are you sure? Are you okay?\n          </div>\n          <div class=\"modal-footer\">\n            <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\" \n              (click)=\"resetEditor()\">Reset</button>\n            <button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\">Cancel</button>\n          </div>\n        </div>\n      </div>\n    </div>\n  </header>\n\n  <div class=\"row\">\n    <div id=\"editor\">\n    </div>\n  </div>\n  <footer>\n    <button type=\"button\" class=\"btn btn-success pull-right\" (click)=\"submit()\">\n      Submit Solution\n    </button>\n  </footer>\n</section>\n\n\n"
 
 /***/ }),
 
@@ -222,6 +222,7 @@ module.exports = "<section>\n   <header>\n     <select class=\"form-control pull
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return EditorComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -236,30 +237,44 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 
+
 var EditorComponent = (function () {
-    function EditorComponent(collaboration) {
+    function EditorComponent(collaboration, route) {
         this.collaboration = collaboration;
-        this.language = "Java";
-        this.languages = ['Java', 'c++', 'Python'];
+        this.route = route;
+        this.language = 'Java';
+        this.languages = ['Java', 'C++', 'Python'];
         this.defaultContent = {
-            'Java': "public class Example{\n  \t\tpublic static void main(String[] args){\n  \t\t\t//type your Java code here\n  \t\t}\n  \t}",
-            'C++': "#include <iostream> \n      using namespace std; \n      int main() { \n    // Type your C++ code here \n     return 0; \n    }",
+            'Java': "public class Example {\npublic static void main(String[] args) { \n    // Type your Java code here \n    } \n}",
+            'C++': "#include <iostream> \nusing namespace std; \nint main() { \n  // Type your C++ code here \n  return 0; \n}",
             'Python': "class Solution: \n   def example(): \n       # Write your Python code here"
         };
     }
     EditorComponent.prototype.ngOnInit = function () {
-        //   var editor = ace.edit("editor");
-        // editor.setTheme("ace/theme/monokai");
-        // editor.getSession().setMode("ace/mode/javascript");
-        // 
+        var _this = this;
+        this.route.params.subscribe(function (params) {
+            // this.problem = this.data.getProblem(+params['id']);
+            _this.sessionId = params['id'];
+            _this.initEditor();
+        });
+    };
+    EditorComponent.prototype.initEditor = function () {
+        var _this = this;
         this.editor = ace.edit('editor');
         this.editor.setTheme('ace/theme/eclipse');
         this.editor.setFontSize(18);
         this.editor.$blockScrolling = Infinity;
-        // this.editor.getSession().setMode('ace/mode/java'); 
-        // this.editor.setValue(this.defaultContent['Java'])
+        // this.editor.getSession().setMode('ace/mode/java');
+        // this.editor.setValue(this.defaultContent['Java']);
         this.resetEditor();
-        this.collaboration.init();
+        this.collaboration.init(this.editor, this.sessionId);
+        this.editor.lastAppliedChange = null;
+        this.editor.on('change', function (e) {
+            console.log('Editor Component: ' + JSON.stringify(e));
+            if (_this.editor.lastAppliedChange != e) {
+                _this.collaboration.change(JSON.stringify(e));
+            }
+        });
     };
     EditorComponent.prototype.resetEditor = function () {
         console.log('Resetting editor');
@@ -268,15 +283,14 @@ var EditorComponent = (function () {
     };
     EditorComponent.prototype.setLanguage = function (language) {
         this.language = language;
-        // //add a map for labguage and js file name c++
-        // this.editor.getSession().setMode(`ace/mode/${language.toLowerCase()}`); 
-        // this.editor.setValue(this.defaultContent[language])
+        // add a map for language and js file name
+        // this.editor.getSession().setMode(`ace/mode/${language.toLowerCase()}`);
+        // this.editor.setValue(this.defaultContent[language]);
         this.resetEditor();
     };
     EditorComponent.prototype.submit = function () {
-        console.log('submit');
         var userCodes = this.editor.getValue();
-        console.log(userCodes);
+        console.log('submit....' + userCodes);
     };
     return EditorComponent;
 }());
@@ -287,9 +301,10 @@ EditorComponent = __decorate([
         styles: [__webpack_require__("../../../../../src/app/components/editor/editor.component.css")]
     }),
     __param(0, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Inject"])('collaboration')),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [Object, typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_router__["c" /* ActivatedRoute */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_router__["c" /* ActivatedRoute */]) === "function" && _a || Object])
 ], EditorComponent);
 
+var _a;
 //# sourceMappingURL=editor.component.js.map
 
 /***/ }),
@@ -750,11 +765,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var CollaborationService = (function () {
     function CollaborationService() {
     }
-    CollaborationService.prototype.init = function () {
-        this.collaboration_socket = io(window.location.origin, { query: 'message=' + 'haha' });
-        this.collaboration_socket.on('message', function (message) {
-            console.log('message from server:' + message);
+    CollaborationService.prototype.init = function (editor, sessionId) {
+        this.collaborationSocket = io(window.location.origin, { query: 'sessionId=' + sessionId });
+        //this.collaboration_socket.on('message', (message)=>{
+        //	console.log('message from server:' + message);
+        //})
+        this.collaborationSocket.on('change', function (delta) {
+            console.log('colla serveice:editor changed by' + delta);
+            delta = JSON.parse(delta);
+            editor.lastAppliedChange = delta;
+            editor.getSession().getDocument().applyDeltas([delta]);
         });
+    };
+    CollaborationService.prototype.change = function (delta) {
+        this.collaborationSocket.emit('change', delta);
     };
     return CollaborationService;
 }());
